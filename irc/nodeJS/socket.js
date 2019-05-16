@@ -14,7 +14,7 @@ io.use(sharedsession (session, {
     autoSave : true
 })); 
 
-
+const users = [];
 
 io.on('connection', (sockets) => {
 
@@ -22,6 +22,8 @@ io.on('connection', (sockets) => {
         // sockets.handshake.session.userdata = nickname;
         // sockets.handshake.session.save();
         sockets.emit('getUser', nickname);
+        sockets.broadcast.emit('getMessages', nickname + ' vient de rejoindre le canal')
+        users.push(nickname);
     })
 
     sockets.on('sendMessage', (message) => {
