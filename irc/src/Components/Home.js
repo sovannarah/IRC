@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import TextField from '@material-ui/core/TextField';
 import Fab from '@material-ui/core/Fab';
-import Socket from '../api';
+import { login, sessionSave } from '../api';
 
 class Home extends Component {
 
@@ -24,13 +24,14 @@ class Home extends Component {
     }
 
     async handleSubmit(event) {
-        // Socket.login(this.state.nickname)
-        sessionStorage.setItem('name', this.state.nickname)
+        login(this.state.nickname);
     }
 
     render() {
-        // sessionStorage.clear()
-        console.log(sessionStorage.getItem('name'))
+        sessionSave((res)=> {
+            sessionStorage.setItem('name', res)
+        })
+        
         return(
             <section className="h-100 d-flex">
                 <div className="h-50 col-3 d-flex flex-column m-auto">

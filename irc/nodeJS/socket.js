@@ -14,11 +14,14 @@ io.use(sharedsession (session, {
     autoSave : true
 })); 
 
+
+
 io.on('connection', (sockets) => {
+
     sockets.on('login', (nickname) => {
-        sockets.handshake.session.userdata = nickname;
-        sockets.handshake.session.save();
-        sockets.emit('timer', nickname);
+        // sockets.handshake.session.userdata = nickname;
+        // sockets.handshake.session.save();
+        sockets.emit('getUser', nickname);
     })
 
     sockets.on('sendMessage', (message) => {
