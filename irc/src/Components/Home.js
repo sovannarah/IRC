@@ -29,9 +29,10 @@ class Home extends Component {
 
     render() {
         sessionSave((res)=> {
-            sessionStorage.setItem('name', res)
+            sessionStorage.setItem('id', res.id);
+            sessionStorage.setItem('name', res.nickname);
         })
-        
+        console.log(this.state.messages)
         return(
             <section className="h-100 d-flex">
                 <div className="h-50 col-3 d-flex flex-column m-auto">

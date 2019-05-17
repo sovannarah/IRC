@@ -9,17 +9,23 @@ class Header extends Component {
     }
 
     render() {
+
+        let buttonLogout ;
+        if (sessionStorage.getItem('name')) {
+            buttonLogout = <form onSubmit={this.logout}>
+                                <button type="submit">
+                                    <img src={Logout} alt="logout"/>
+                                </button>
+                            </form>;
+        }
+        
         return (
             <header className="container-fluid bg-dark">
                 <div className="navbar navbar-light bg-light">
                     <Link className="navbar-brand" to="/">
                         <p>IRC</p>
                     </Link>
-                    <form onSubmit={this.logout}>
-                        <button type="submit">
-                            <img src={Logout} alt="logout"/>
-                        </button>
-                    </form>
+                    {buttonLogout}
                 </div>
             </header>
         );

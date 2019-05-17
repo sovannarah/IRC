@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { sendMessage, getMessages, sendCommand } from '../api';
+import { sendMessage, getMessages, sendCommand, getRoom } from '../api';
 import TextField from '@material-ui/core/TextField';
 
 class Chat extends Component {
@@ -9,15 +9,19 @@ class Chat extends Component {
             this.state = { 
                 message: '',
                 messages: [],
+                room: '',
                 orders: ["nick", "list", "create", "delete", "join",
                          "part", "users", "msg"]
             }
-
             this.handleChange = this.handleChange.bind(this);
             this.handleSubmit = this.handleSubmit.bind(this);
             
             getMessages((err, gMessages) => {
                 this.setState({messages : [...this.state.messages,...gMessages]})
+            })
+
+            getRoom((err, curRoom) => {
+                this.setState({room: curRoom})
             })
     }
 
@@ -47,17 +51,17 @@ class Chat extends Component {
         event.preventDefault();
         let checkCmd = this.checkCmd();
         if(checkCmd === undefined) {
-            sendMessage(sessionStorage.getItem('name') ,this.state.message);
+            sendMessage(sessionStorage.getItem('name'),this.state.message, this.state.room);
         } else if (checkCmd === false) {
             sendMessage('Error', "Cette commande n'existe pas");
         } else {
-            sendCommand(checkCmd);
+            let arrayString = this.state.message.split(' ');
+            sendCommand([checkCmd, arrayString[1]]);    
         }
         this.setState({message: ''});
     }
 
     render() {
-        // sessionStorage.clear()
         return (
             <div className="container-fluid chat h-75">
                 <div className="chat col-12 h-75 mt-5 mb-5 border">
