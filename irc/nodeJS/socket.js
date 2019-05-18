@@ -16,17 +16,10 @@ io.use(sharedsession (session, {
 })); 
 
 const users = [];
-const rooms = ["public", "test"];
+const rooms = ["public"];
 
-//////////////////////////////////////////////////////
-// io.of('/chat').on('connection', function(sockets){
-//     console.log('enter')
-// })
-
-
-///////////////////////////////////////////////////////
 io.on('connection', (sockets) => {
-    let room = "";
+    let room = "public";
     sockets.on('login', (nickname) => {
         // sockets.handshake.session.userdata = nickname;
         // sockets.handshake.session.save();
@@ -38,8 +31,7 @@ io.on('connection', (sockets) => {
     })
 
     sockets.on('sendMessage', (message) => {
-        console.log(message["room"])
-        // sockets.broadcast.emit('getMessages', message);
+        sockets.emit('getMessages', message)
         sockets.to(room).emit('getMessages', message)
     })
 
@@ -50,6 +42,9 @@ io.on('connection', (sockets) => {
             break;
             case 'create': 
             sockets.join(cmd[1]);
+            let createMess = 'Le canal ' + cmd[1] + ' vient d\'etre creer'
+            sockets.emit('getMessages', [{mess: createMess}] )
+            sockets.broadcast.emit('getMessages', [{mess: createMess}] )
             break;
             case 'join':
             sockets.join(cmd[1]);
@@ -59,52 +54,7 @@ io.on('connection', (sockets) => {
             default:
                 console.log('break')
         }
-        // if(cmd[0] === 'users'){
-        //     sockets.emit('getMessages', users)
-        // } else if (cmd[0] === 'create'){
-        //     sockets.join(cmd[1])
-        //     console.log(sockets.rooms)
-        // } else if ()
-    })
-})
-
-rooms.forEach(function(room) {
-    io.of('/' + room).on('connection', (sockets) => {
-        sockets.emit('getMessages', [{mess: 'vous avez rejoint le canal: ' + room}])
     })
 })
 
 
-// rooms.forEach(room => {
-    // io.of('/').on('connection', (sockets) => {
-    //     sockets.emit('getMessages', [{mess: 'vous avez rejoint le canal: ' + room}])
-    //     sockets.on('login', (nickname) => {
-    //         let user = {id: id(), nickname: nickname}; 
-    //         users.push(user);
-    //         sockets.emit('getUser', user);
-    //         sockets.broadcast.emit('getMessages', [{mess: nickname + ' vient de rejoindre le canal'}])
-            
-    //     })
-
-        
-    //     sockets.on('sendMessage', (message) => {
-    //         sockets.broadcast.emit('getMessages', message);
-    //         sockets.emit('getMessages', message)
-    //     })
-
-    //     sockets.on('command', (cmd) => {  
-    //         switch(cmd) {
-    //             case "users":
-    //                 sockets.emit('getMessages', users);
-    //                 break;
-    //             // case "join":
-    //             //     room = "public"
-    //             //     break;
-    //             default:
-    //                 console.log('default') 
-    //         } 
-            
-    //     })
-
-    // })
-// })

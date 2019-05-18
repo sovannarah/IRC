@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { sendMessage, getMessages, sendCommand, getRoom } from '../api';
+import { sendMessage, getMessages, sendCommand } from '../api';
 import TextField from '@material-ui/core/TextField';
 
 class Chat extends Component {
@@ -9,7 +9,6 @@ class Chat extends Component {
             this.state = { 
                 message: '',
                 messages: [],
-                room: '',
                 orders: ["nick", "list", "create", "delete", "join",
                          "part", "users", "msg"]
             }
@@ -20,9 +19,6 @@ class Chat extends Component {
                 this.setState({messages : [...this.state.messages,...gMessages]})
             })
 
-            getRoom((err, curRoom) => {
-                this.setState({room: curRoom})
-            })
     }
 
     
@@ -51,7 +47,7 @@ class Chat extends Component {
         event.preventDefault();
         let checkCmd = this.checkCmd();
         if(checkCmd === undefined) {
-            sendMessage(sessionStorage.getItem('name'),this.state.message, this.state.room);
+            sendMessage(sessionStorage.getItem('name'),this.state.message);
         } else if (checkCmd === false) {
             sendMessage('Error', "Cette commande n'existe pas");
         } else {

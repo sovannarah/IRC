@@ -11,8 +11,8 @@ function sessionSave(display) {
     
 }
 
-function sendMessage(user, message, room) {
-    socket.emit('sendMessage', [{nickname: user, mess:message, room:room}]);
+function sendMessage(user, message) {
+    socket.emit('sendMessage', [{nickname: user, mess:message}]);
 }
 
 function getMessages(display) {
@@ -26,11 +26,6 @@ function sendCommand(cmd) {
     socket.emit('command', cmd);
 }
 
-function getRoom(){
-    socket.on('roomName', room => {
-        console.log(room)
-    })
-}
 
 
-export { login, sessionSave, sendMessage, getMessages, sendCommand, getRoom};
+export { login, sessionSave, sendMessage, getMessages, sendCommand };
