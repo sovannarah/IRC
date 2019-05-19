@@ -26,6 +26,10 @@ function sendCommand(cmd) {
     socket.emit('command', cmd);
 }
 
+function getRoom() {
+    socket.on('getRoom', room => { 
 
+    });
+}
 
-export { login, sessionSave, sendMessage, getMessages, sendCommand };
+export { login, sessionSave, sendMessage, getMessages, sendCommand, getRoom };

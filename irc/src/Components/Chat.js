@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
-import { sendMessage, getMessages, sendCommand } from '../api';
+import { sendMessage, getMessages, sendCommand, getRoom } from '../api';
 import TextField from '@material-ui/core/TextField';
+import stayScrolled from 'react-stay-scrolled';
+// import Messages from './Messages';
 
 class Chat extends Component {
 
@@ -19,6 +21,9 @@ class Chat extends Component {
                 this.setState({messages : [...this.state.messages,...gMessages]})
             })
 
+            getRoom(room =>{
+                console.log(room)
+            })
     }
 
     
@@ -58,19 +63,36 @@ class Chat extends Component {
     }
 
     render() {
+
         return (
             <div className="container-fluid chat h-75">
-                <div className="chat col-12 h-75 mt-5 mb-5 border">
-                    {this.state.messages.map((message, index) => (
-                        <div className="row" key={index}>
-                            <div className="col-3">
-                                {message.nickname}
-                            </div>
-                            <div className="col-9 d-flex justify-content-start">
-                                {message.mess}
-                            </div>
-                        </div>
-                    ))}
+                <div className="chat col-12 h-75 mt-5 mb-5 border ">
+                    {/* <Messages messages={this.state.messages} /> */}
+                    {this.state.messages.map((message, index) => {
+                        let bgColor;
+                        if(message.nickname !== 'Info' && message.nickname !== 'Error') {
+                            bgColor = (index%2 === 0) ? 'bg-light' : 'bg-secondary-white'
+                        } else {
+                            switch (message.nickname) {
+                                case 'Info':
+                                bgColor = "bg-info";
+                                break;
+                                case 'Error':
+                                bgColor = 'bg-danger';
+                                break;
+                                default: 
+                                bgColor = "";
+                            }
+                        }
+                        return  <div className={`row ${bgColor}`} key={index}>
+                                    <div className="col-3">
+                                        {message.nickname}
+                                    </div>
+                                    <div className="col-9 d-flex justify-content-start">
+                                        {message.mess}
+                                    </div>
+                                </div>
+                    })}
                 </div>
                 <form onSubmit={this.handleSubmit} className="d-flex row">
                     <div className="form-group col-10 m-auto"> 
