@@ -17,7 +17,6 @@ function sendMessage(user, message) {
 
 function getMessages(display) {
     socket.on('getMessages', messages =>{
-        console.log(messages);
         display(null, messages);
     });
 }
@@ -26,9 +25,9 @@ function sendCommand(cmd) {
     socket.emit('command', cmd);
 }
 
-function getRoom() {
+function getRoom(display) {
     socket.on('getRoom', room => { 
-
+        display(room)
     });
 }
 

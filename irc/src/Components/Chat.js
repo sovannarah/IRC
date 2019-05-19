@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { sendMessage, getMessages, sendCommand, getRoom } from '../api';
+import { sendMessage, getMessages, sendCommand, getRoom, sessionSave } from '../api';
 import TextField from '@material-ui/core/TextField';
-import stayScrolled from 'react-stay-scrolled';
+// import stayScrolled from 'react-stay-scrolled';
 // import Messages from './Messages';
 
 class Chat extends Component {
@@ -11,6 +11,7 @@ class Chat extends Component {
             this.state = { 
                 message: '',
                 messages: [],
+                room: '',
                 orders: ["nick", "list", "create", "delete", "join",
                          "part", "users", "msg"]
             }
@@ -21,8 +22,8 @@ class Chat extends Component {
                 this.setState({messages : [...this.state.messages,...gMessages]})
             })
 
-            getRoom(room =>{
-                console.log(room)
+            getRoom(curRoom =>{
+                this.setState({room: curRoom})
             })
     }
 
@@ -52,7 +53,7 @@ class Chat extends Component {
         event.preventDefault();
         let checkCmd = this.checkCmd();
         if(checkCmd === undefined) {
-            sendMessage(sessionStorage.getItem('name'),this.state.message);
+            sendMessage(sessionStorage.getItem('name'), this.state.message);
         } else if (checkCmd === false) {
             sendMessage('Error', "Cette commande n'existe pas");
         } else {
@@ -63,7 +64,11 @@ class Chat extends Component {
     }
 
     render() {
-
+        sessionSave((res)=> {
+            sessionStorage.setItem('id', res.id);
+            sessionStorage.setItem('name', res.nickname);
+        })
+        console.log(sessionStorage.getItem('name'))
         return (
             <div className="container-fluid chat h-75">
                 <div className="chat col-12 h-75 mt-5 mb-5 border ">
