@@ -78,7 +78,6 @@ io.on('connection', (sockets) => {
                 }
             break;
             case "msg":
-            console.log()
                 sockets.in(cmd[1]).emit('getMessages', [{nickname: user.nickname, mess:'test'}])
             break;
             case 'nick':
@@ -100,9 +99,25 @@ io.on('connection', (sockets) => {
             case "list": 
                 let roomList = "";
                 for(let i = 0; i < rooms.length; i++) {
-                    roomList += rooms[i].roomName +  '\n';
+                    if (cmd[1]) {
+                        let mim = true;
+                        for(let y = 0 ; y < cmd[1].length; y++) {
+                            if (cmd[1][y] !== rooms[i].roomName[y]) {
+                                mim = false;
+                            }
+                        }
+                        if(mim === true ) {
+                            roomList += rooms[i].roomName +  '\n';
+                        }
+                    } else {
+                        roomList += rooms[i].roomName +  '\n';
+                    }
                 }
-                sockets.emit('getMessages', [{nickname: 'Info', mess: roomList}])
+                if(roomList === "") {
+                    sockets.emit('getMessages', [{nickname: 'Error', mess: 'Aucune liste trouvee'}]);
+                } else {
+                    sockets.emit('getMessages', [{nickname: 'Info', mess: roomList}]);
+                }
             break;
             default:
                 console.log('break')
