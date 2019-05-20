@@ -1,5 +1,5 @@
 const io = require('socket.io')().listen(8000);
-
+const id = require('uniqid');
 const users = [];
 let user = {};
 const rooms = [];
@@ -7,8 +7,7 @@ const rooms = [];
 io.on('connection', (sockets) => {
     let room = "";
     sockets.on('login', (nickname) => {
-        console.log(sockets.rooms)
-        user = {id: sockets.id, nickname: nickname}; 
+        user = {id: id(), nickname: nickname}; 
         users.push(user);
         sockets.emit('getUser', user);
     })
@@ -16,6 +15,11 @@ io.on('connection', (sockets) => {
     sockets.on('sendMessage', (message) => {
         sockets.emit('getMessages', message)
         sockets.to(room).emit('getMessages', message)
+    })
+
+    sockets.on('currUser', (usr) => {
+        user = usr;
+        console.log(user)
     })
 
     sockets.on('command', (cmd) => {   
@@ -37,22 +41,31 @@ io.on('connection', (sockets) => {
                 if(roomExist === false) {
                     sockets.join(cmd[1]);
                     let createMess = 'Le canal ' + cmd[1] + ' vient d\'etre creer';
-                    rooms.push({adminId: user.id, roomId: sockets.id, roomName: cmd[1]});
+                    rooms.push({adminId: user.id, roomId: id(), roomName: cmd[1]});
                     sockets.emit('getMessages', [{nickname: 'Info', mess: createMess}]);
                     sockets.broadcast.emit('getMessages', [{nickname: 'Info', mess: createMess}]);
                 } else {
                     let msgError = 'Ce canal existe deja! Utiliser la commande /join si vous souhaitez le rejoindre!';
                     sockets.emit('getMessages', [{nickname: 'Error', mess: msgError}])
                 }
-                console.log(sockets.rooms)
-               
             break;
             case 'join':
-                sockets.join(cmd[1]);
-                room = cmd[1];
-                sockets.emit('getRoom', room);
-                sockets.emit('getMessages', [{nickname: 'Info', mess:  'Vous avez rejoint le canal ' + cmd[1]}]);
-                sockets.to(room).emit('getMessages', [{nickname: 'Info', mess: user.nickname + ' vous a rejoint sur le canal'}]);
+                let existJoin = false;
+                console.log(rooms.length)
+                for(let j = 0; j < rooms.length; j++) {
+                    if(cmd[1] === rooms[j].roomName) {
+                        existJoin = true; 
+                    }
+                }
+                if(existJoin === true) {
+                    sockets.join(cmd[1]);
+                    room = cmd[1];
+                    sockets.emit('getRoom', room);
+                    sockets.emit('getMessages', [{nickname: 'Info', mess:  'Vous avez rejoint le canal ' + cmd[1]}]);
+                    sockets.to(room).emit('getMessages', [{nickname: 'Info', mess: user.nickname + ' vous a rejoint sur le canal'}]);
+                } else {
+                    sockets.emit('getMessages', [{nickname: 'Error', mess: 'Le canal choisi n\'existe pas'}]);
+                }
             break;
             case 'part':
                 if(cmd[1] === room) {
@@ -68,28 +81,39 @@ io.on('connection', (sockets) => {
             case "msg":
                 for(let m = 0; m < users.length; m++) {
                     if(cmd[1] === users[m].nickname) {
-                        console.log(users[m].id)
                         sockets.broadcast.to(users[m].id).emit('getMessages', [{nickname: user.nickname, mess:'test'}])
                     }
                 }
-                
             break;
             case 'nick':
                 for(let n = 0 ; n < users.length; n++) {
-                    console.log(users[n])
                     if(user.id === users[n].id) {
-                        console.log(users[n])
                         users[n] = {id: user.id, nickname: cmd[1]};
                         sockets.emit('getMessages', [{nickname: 'Info', mess: 'Vous avez changer de nom en : ' + cmd[1]}])
                         sockets.broadcast.emit('getMessages', [{nickname: 'Info', mess: user.nickname + ' a changer de nom en : ' + cmd[1]}])
-                        user = {id: user.id, nickname: cmd[1]}
+                        // user = {id: user.id, nickname: cmd[1]}
                         sockets.emit('getUser', user);
                     }
                 }
             break;
             case 'delete':
-                delete sockets.rooms[cmd[1]];
-                console.log(sockets.rooms)
+                let deleteRoom = {};
+                let index = 0;
+                for(let d = 0; d < rooms.length; d++) {
+                    if(rooms[d].roomName === cmd[1]) {
+                        deleteRoom = rooms[d];
+                        index = d;
+                    }
+                }
+                if(user['id'] === deleteRoom['adminId']) {
+                    rooms.splice(index, index);
+                    delete sockets.rooms[cmd[1]];
+                    let createMess = 'Le canal ' + cmd[1] + ' vient d\'etre supprimer';
+                    sockets.emit('getMessages', [{nickname: 'Info', mess: createMess}]);
+                    sockets.broadcast.emit('getMessages', [{nickname: 'Info', mess: createMess}]);
+                } else {
+                    sockets.emit('getMessages', [{nickname: 'Error', mess: 'Vous devez etre admin de se canal pour le supprimer'}]);
+                }
             break;
             case "list": 
                 let roomList = "";

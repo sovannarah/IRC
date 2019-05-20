@@ -30,4 +30,8 @@ function getRoom(display) {
     });
 }
 
-export { login, sessionSave, sendMessage, getMessages, sendCommand, getRoom };
+function user(user) {
+    socket.emit('currUser', user);
+}
+
+export { login, sessionSave, sendMessage, getMessages, sendCommand, getRoom, user };

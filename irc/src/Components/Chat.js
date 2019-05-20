@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import { sendMessage, getMessages, sendCommand, getRoom, sessionSave } from '../api';
+import { sendMessage, getMessages, sendCommand, getRoom, sessionSave, user } from '../api';
 import TextField from '@material-ui/core/TextField';
+import {Emojione} from 'react-emoji-render';
 // import stayScrolled from 'react-stay-scrolled';
 // import Messages from './Messages';
 
@@ -58,7 +59,8 @@ class Chat extends Component {
             sendMessage('Error', "Cette commande n'existe pas");
         } else {
             let arrayString = this.state.message.split(' ');
-            sendCommand([checkCmd, arrayString[1]]);    
+            user({id: sessionStorage.getItem('id') ,name: sessionStorage.getItem('name')})
+            sendCommand([checkCmd, arrayString[1]]);     
         }
         this.setState({message: ''});
     }
@@ -92,9 +94,8 @@ class Chat extends Component {
                                     <div className="col-3">
                                         {message.nickname}
                                     </div>
-                                    <div className="col-9 d-flex justify-content-start">
-                                        {message.mess}
-                                    </div>
+                                    <Emojione text={message.mess} className="col-9 d-flex justify-content-start">    
+                                    </Emojione>
                                 </div>
                     })}
                 </div>
