@@ -59,17 +59,19 @@ class Chat extends Component {
             sendMessage('Error', "Cette commande n'existe pas");
         } else {
             let arrayString = this.state.message.split(' ');
-            user({id: sessionStorage.getItem('id') ,name: sessionStorage.getItem('name')})
+            user({id: sessionStorage.getItem('id') , nickname: sessionStorage.getItem('name')})
             sendCommand([checkCmd, arrayString[1]]);     
         }
         this.setState({message: ''});
     }
 
     render() {
+
         sessionSave((res)=> {
             sessionStorage.setItem('id', res.id);
             sessionStorage.setItem('name', res.nickname);
         })
+        console.log(sessionStorage.getItem('id'))
         return (
             <div className="container-fluid chat h-75">
                 <div className="chat col-12 h-75 mt-5 mb-5 border ">
