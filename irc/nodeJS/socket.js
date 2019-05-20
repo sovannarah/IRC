@@ -1,30 +1,14 @@
 const io = require('socket.io')().listen(8000);
-const express = require('express');
-const id = require('uniqid')
-const app = express();
-const session = require('express-session')({
-    secret : " mon secret " , 
-    resave : true , 
-    saveUninitialized : true 
-})
-const sharedsession = require('express-socket.io-session')
-
-app.use(session);
-
-io.use(sharedsession (session, { 
-    autoSave : true
-})); 
 
 const users = [];
 let user = {};
 const rooms = [];
 
 io.on('connection', (sockets) => {
-    let room = "public";
+    let room = "";
     sockets.on('login', (nickname) => {
-        // sockets.handshake.session.userdata = nickname;
-        // sockets.handshake.session.save();
-        user = {id: id(), nickname: nickname}; 
+        console.log(sockets.rooms)
+        user = {id: sockets.id, nickname: nickname}; 
         users.push(user);
         sockets.emit('getUser', user);
     })
@@ -44,7 +28,6 @@ io.on('connection', (sockets) => {
                 sockets.emit('getMessages', [{nickname: 'Info', mess: userList}])
             break;
             case 'create': 
-                sockets.join(cmd[1]);
                 let roomExist = false;
                 for(let c = 0 ; c < rooms.length; c++) {
                     if(cmd[1] === rooms[c].roomName) {
@@ -52,33 +35,44 @@ io.on('connection', (sockets) => {
                     } 
                 }
                 if(roomExist === false) {
+                    sockets.join(cmd[1]);
                     let createMess = 'Le canal ' + cmd[1] + ' vient d\'etre creer';
-                    rooms.push({adminId: user.id, roomId: id(), roomName: cmd[1]});
+                    rooms.push({adminId: user.id, roomId: sockets.id, roomName: cmd[1]});
                     sockets.emit('getMessages', [{nickname: 'Info', mess: createMess}]);
                     sockets.broadcast.emit('getMessages', [{nickname: 'Info', mess: createMess}]);
                 } else {
                     let msgError = 'Ce canal existe deja! Utiliser la commande /join si vous souhaitez le rejoindre!';
                     sockets.emit('getMessages', [{nickname: 'Error', mess: msgError}])
                 }
+                console.log(sockets.rooms)
+               
             break;
             case 'join':
                 sockets.join(cmd[1]);
-                room = cmd[1]
+                room = cmd[1];
                 sockets.emit('getRoom', room);
                 sockets.emit('getMessages', [{nickname: 'Info', mess:  'Vous avez rejoint le canal ' + cmd[1]}]);
                 sockets.to(room).emit('getMessages', [{nickname: 'Info', mess: user.nickname + ' vous a rejoint sur le canal'}]);
             break;
             case 'part':
                 if(cmd[1] === room) {
-                    sockets.leave(cmd[1]);
+                    sockets.leave(cmd[1])
+                    sockets.emit('getRoom', '');
                     sockets.emit('getMessages', [{nickname: 'Info', mess: 'Vous avez quitte le canal ' + cmd[1]}]);
                     sockets.to(room).emit('getMessages', [{nickname: 'Info', mess: user.nickname + ' a quitte le canal'}]);
+                    room = "";
                 } else {
                     sockets.emit('getMessages', [{nickname: 'Error', mess: 'Vous ne pouvez pas quitter un autre canal que l\'actuel : ' + room}]);
                 }
             break;
             case "msg":
-                sockets.in(cmd[1]).emit('getMessages', [{nickname: user.nickname, mess:'test'}])
+                for(let m = 0; m < users.length; m++) {
+                    if(cmd[1] === users[m].nickname) {
+                        console.log(users[m].id)
+                        sockets.broadcast.to(users[m].id).emit('getMessages', [{nickname: user.nickname, mess:'test'}])
+                    }
+                }
+                
             break;
             case 'nick':
                 for(let n = 0 ; n < users.length; n++) {
@@ -94,7 +88,8 @@ io.on('connection', (sockets) => {
                 }
             break;
             case 'delete':
-                
+                delete sockets.rooms[cmd[1]];
+                console.log(sockets.rooms)
             break;
             case "list": 
                 let roomList = "";

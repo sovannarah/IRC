@@ -68,7 +68,6 @@ class Chat extends Component {
             sessionStorage.setItem('id', res.id);
             sessionStorage.setItem('name', res.nickname);
         })
-        console.log(sessionStorage.getItem('name'))
         return (
             <div className="container-fluid chat h-75">
                 <div className="chat col-12 h-75 mt-5 mb-5 border ">

@@ -3,7 +3,6 @@ const  socket = openSocket('http://localhost:8000/');
 
 function login(nickname) {
     socket.emit('login', nickname);
-    
 }
 
 function sessionSave(display) {
