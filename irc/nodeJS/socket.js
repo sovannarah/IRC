@@ -4,9 +4,10 @@ const users = [];
 let user = {};
 const rooms = [];
 
+const curRoom = [];
 io.on('connection', (sockets) => {
     let room = "";
-    console.log('connexion: ' + sockets.id)
+    
     sockets.on('login', (nickname) => {
         user = {id: sockets.id, nickname: nickname}; 
         users.push(user);
@@ -32,10 +33,12 @@ io.on('connection', (sockets) => {
         switch(cmd[0]) {
             case 'users': 
             let userList = "";
-                for(let i = 0; i < users.length; i++) {
-                    userList += users[i].nickname +  '\n';
+            for(let y = 0; y < curRoom.length; y++) {
+                if(room === curRoom[y][0]){
+                    userList += curRoom[y][1].nickname + "\n";
                 }
-                sockets.emit('getMessages', [{nickname: 'Info', mess: userList}])
+            }
+            sockets.emit('getMessages', [{nickname: 'Info', mess: userList}]);
             break;
             case 'create': 
                 let roomExist = false;
@@ -65,6 +68,7 @@ io.on('connection', (sockets) => {
                 if(existJoin === true) {
                     sockets.join(cmd[1]);
                     room = cmd[1];
+                    curRoom.push([room, user]);
                     sockets.emit('getRoom', room);
                     sockets.emit('getMessages', [{nickname: 'Info', mess:  'Vous avez rejoint le canal ' + cmd[1]}]);
                     sockets.to(room).emit('getMessages', [{nickname: 'Info', mess: user.nickname + ' vous a rejoint sur le canal'}]);
@@ -74,7 +78,12 @@ io.on('connection', (sockets) => {
             break;
             case 'part':
                 if(cmd[1] === room) {
-                    sockets.leave(cmd[1])
+                    sockets.leave(cmd[1]);
+                    for(let c = 0; c < curRoom.length; c++) {
+                        if(user.id === curRoom[c][1].id) {
+                            curRoom.splice(c, c);
+                        }
+                    }
                     sockets.emit('getRoom', '');
                     sockets.emit('getMessages', [{nickname: 'Info', mess: 'Vous avez quitte le canal ' + cmd[1]}]);
                     sockets.to(room).emit('getMessages', [{nickname: 'Info', mess: user.nickname + ' a quitte le canal'}]);
@@ -89,7 +98,10 @@ io.on('connection', (sockets) => {
                     msg += cmd[2][r] + " ";
                 }
                 for(let m = 0; m < users.length; m++) {
-                        sockets.in(users[m].id).emit('getMessages', [{nickname: user.nickname, mess: msg}]);
+                    if(cmd[1] === users[m].nickname) {
+                        sockets.emit('getMessages', [{nickname: user.nickname, mess: msg}]);
+                        sockets.to(users[m].id).emit('getMessages', [{nickname: user.nickname, mess: msg}]);
+                    }
                 }
             break;
             case 'nick':
