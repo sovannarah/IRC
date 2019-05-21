@@ -24,10 +24,6 @@ function sendCommand(cmd) {
     socket.emit('command', cmd);
 }
 
-function sendCommandMsg() {
-    
-}
-
 function getRoom(display) {
     socket.on('getRoom', room => { 
         display(room)

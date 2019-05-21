@@ -20,7 +20,6 @@ class Header extends Component {
                                 </form>
                             </label>;
         }
-        
         return (
             <header className="container-fluid bg-dark">
                 <div className="navbar navbar-light bg-light">

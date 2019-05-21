@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import {login, sendMessage, getMessages, sendCommand, getRoom, sessionSave, user } from '../api';
 import TextField from '@material-ui/core/TextField';
 import {Emojione} from 'react-emoji-render';
-import parser from 'bbcode-to-react';
 // import stayScrolled from 'react-stay-scrolled';
 // import Messages from './Messages';
 
@@ -14,16 +13,19 @@ class Chat extends Component {
                 message: '',
                 messages: [],
                 room: '',
+                user: {},
                 orders: ["nick", "list", "create", "delete", "join",
                          "part", "users", "msg"]
             }
             this.handleChange = this.handleChange.bind(this);
             this.handleSubmit = this.handleSubmit.bind(this);
-            
-            if(this.props.nickname) {
                 login(this.props.nickname); 
-            }
-            
+                sessionSave((res)=> {
+                    this.setState({user:{
+                    id:sessionStorage.setItem('id', res.id),
+                    nickname: sessionStorage.setItem('name', res.nickname)
+                    }})
+                })
             getMessages((err, gMessages) => {
                 this.setState({messages : [...this.state.messages,...gMessages]})
             })
@@ -75,12 +77,17 @@ class Chat extends Component {
         this.setState({message: ''});
     }
 
-    render() {
+    save() {
+        
         sessionSave((res)=> {
             sessionStorage.setItem('id', res.id);
             sessionStorage.setItem('name', res.nickname);
         })
-        console.log(sessionStorage.getItem('name'), sessionStorage.getItem('id'))
+    }
+
+    render() {
+        
+        console.log(sessionStorage.getItem('name'), sessionStorage.getItem('id'));
         return (
             <div className="container-fluid chat h-75">
                 <div className="chat col-12 h-75 mt-5 mb-5 border ">

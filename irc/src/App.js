@@ -1,7 +1,6 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
 import Fab from '@material-ui/core/Fab';
-import Home from './Components/Home';
 import Header from './Components/Header';
 import Chat from './Components/Chat';
 
@@ -24,7 +23,6 @@ class App extends React.Component {
   }
 
   async handleSubmit(event) {
-      // login(this.state.nickname);
       if(this.state.nickname !== ""){
         this.setState({submit: true})
       }
