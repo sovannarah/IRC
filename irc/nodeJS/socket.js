@@ -3,8 +3,8 @@ const id = require('uniqid');
 const users = [];
 let user = {};
 const rooms = [];
-
 const curRoom = [];
+
 io.on('connection', (sockets) => {
     let room = "";
     
@@ -23,7 +23,6 @@ io.on('connection', (sockets) => {
     sockets.on('disconnect', (message) => {
         console.log('deconnexion');
     })
-
 
     sockets.on('currUser', (usr) => {
         user = usr;

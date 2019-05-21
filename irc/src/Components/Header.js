@@ -8,17 +8,16 @@ class Header extends Component {
     }
 
     render() {
-
         let buttonLogout;
-        if (sessionStorage.getItem('name')) {
+        if (this.props.button === true) {
             buttonLogout = <label className="d-flex">
-                            <p className="mt-auto mb-auto mr-2">Deconnexion</p>
-                                <form onSubmit={this.logout}>
-                                    <button type="submit">
-                                        <img src={Logout} alt="logout"/>
-                                    </button>
-                                </form>
-                            </label>;
+            <p className="mt-auto mb-auto mr-2">Deconnexion</p>
+                <form onSubmit={this.logout}>
+                    <button type="submit">
+                        <img src={Logout} alt="logout"/>
+                    </button>
+                </form>
+            </label>;
         }
         return (
             <header className="container-fluid bg-dark">

@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import {login, sendMessage, getMessages, sendCommand, getRoom, sessionSave, user } from '../api';
 import TextField from '@material-ui/core/TextField';
 import {Emojione} from 'react-emoji-render';
+import Header from './Header';
+import ScrollToBottom from 'react-scroll-to-bottom';
 // import stayScrolled from 'react-stay-scrolled';
 // import Messages from './Messages';
 
@@ -89,8 +91,10 @@ class Chat extends Component {
         
         console.log(sessionStorage.getItem('name'), sessionStorage.getItem('id'));
         return (
+            <div className="App">
+            <Header button={true}/>
             <div className="container-fluid chat h-75">
-                <div className="chat col-12 h-75 mt-5 mb-5 border ">
+                <ScrollToBottom className="chat col-12 h-75 mt-5 mb-5 border ">
                     {this.state.messages.map((message, index) => {
                         let bgColor;
                         if(message.nickname !== 'Info' && message.nickname !== 'Error') {
@@ -115,7 +119,7 @@ class Chat extends Component {
                                     </Emojione>
                                 </div>
                     })}
-                </div>
+                </ScrollToBottom>
                 <form onSubmit={this.handleSubmit} className="d-flex row">
                     <div className="form-group col-10 m-auto"> 
                         <TextField
@@ -129,6 +133,7 @@ class Chat extends Component {
                         />
                     </div>
                 </form>
+            </div>
             </div>
         );
     }

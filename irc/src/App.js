@@ -31,15 +31,12 @@ class App extends React.Component {
   render() {
   if(this.state.submit === true) {
     return(
-        <div className="App">
-          <Header />
           <Chat nickname={this.state.nickname} /> 
-        </div>
     );
   } else {
     return (
         <div className="App">
-          <Header />
+          <Header button={false}/>
           <section className="h-100 d-flex">
                 <div className="h-50 col-3 d-flex flex-column m-auto">
                     <h1>Connect to IRC</h1>
