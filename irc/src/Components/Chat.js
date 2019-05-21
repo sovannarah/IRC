@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { sendMessage, getMessages, sendCommand, getRoom, sessionSave, user } from '../api';
+import {login, sendMessage, getMessages, sendCommand, getRoom, sessionSave, user } from '../api';
 import TextField from '@material-ui/core/TextField';
 import {Emojione} from 'react-emoji-render';
+import parser from 'bbcode-to-react';
 // import stayScrolled from 'react-stay-scrolled';
 // import Messages from './Messages';
 
@@ -18,6 +19,10 @@ class Chat extends Component {
             }
             this.handleChange = this.handleChange.bind(this);
             this.handleSubmit = this.handleSubmit.bind(this);
+            
+            if(this.props.nickname) {
+                login(this.props.nickname); 
+            }
             
             getMessages((err, gMessages) => {
                 this.setState({messages : [...this.state.messages,...gMessages]})
@@ -59,23 +64,26 @@ class Chat extends Component {
             sendMessage('Error', "Cette commande n'existe pas");
         } else {
             let arrayString = this.state.message.split(' ');
-            user({id: sessionStorage.getItem('id') , nickname: sessionStorage.getItem('name')})
-            sendCommand([checkCmd, arrayString[1]]);     
+            if(checkCmd === 'msg') {
+                user({id: sessionStorage.getItem('id') , nickname: sessionStorage.getItem('name')})
+                sendCommand([checkCmd, arrayString[1], arrayString]); 
+            } else {
+                user({id: sessionStorage.getItem('id') , nickname: sessionStorage.getItem('name')})
+                sendCommand([checkCmd, arrayString[1]]); 
+            }    
         }
         this.setState({message: ''});
     }
 
     render() {
-
         sessionSave((res)=> {
             sessionStorage.setItem('id', res.id);
             sessionStorage.setItem('name', res.nickname);
         })
-        console.log(sessionStorage.getItem('id'))
+        console.log(sessionStorage.getItem('name'), sessionStorage.getItem('id'))
         return (
             <div className="container-fluid chat h-75">
                 <div className="chat col-12 h-75 mt-5 mb-5 border ">
-                    {/* <Messages messages={this.state.messages} /> */}
                     {this.state.messages.map((message, index) => {
                         let bgColor;
                         if(message.nickname !== 'Info' && message.nickname !== 'Error') {

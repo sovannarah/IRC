@@ -5,6 +5,7 @@
   "dependencies": {
     "@material-ui/core": "^3.9.3",
     "axios": "^0.18.0",
+    "bbcode-to-react": "^0.2.9",
     "local-storage": "^2.0.0",
     "react": "^16.8.6",
     "react-bootstrap": "^1.0.0-beta.8",

@@ -6,16 +6,9 @@ const rooms = [];
 
 io.on('connection', (sockets) => {
     let room = "";
+    console.log('connexion: ' + sockets.id)
     sockets.on('login', (nickname) => {
-        let userId = '';
-        for(let i in io.sockets.sockets) {
-            userId = i;
-            console.log(i)
-        }
-        console.log('------------------------------------------------------')
-        console.log(userId)
-        console.log('------------------------------------------------------')
-        user = {id: userId, nickname: nickname}; 
+        user = {id: sockets.id, nickname: nickname}; 
         users.push(user);
         sockets.emit('getUser', user);
         
@@ -27,7 +20,7 @@ io.on('connection', (sockets) => {
     })
 
     sockets.on('disconnect', (message) => {
-        // console.log('deconnexion');
+        console.log('deconnexion');
     })
 
 
@@ -91,39 +84,12 @@ io.on('connection', (sockets) => {
                 }
             break;
             case "msg":
-                // if(cmd[1]){
-                // sockets.to(cmd[1]).emit('getMessages', [{nickname: user.nickname, mess:'test'}])
-                // }
-                // console.log(users);
-
-                // Object.keys(io.sockets.sockets).forEach(socket => {
-                //     console.log(socket);
-                //     sockets.in(socket).emit('getMessages', [{nickname: user.nickname, mess:'test'}]);
-                // });
-            //    for(let i in io.sockets.sockets) {
-            //         console.log(i)
-            //         sockets.in(i).emit('getMessages', [{nickname: user.nickname, mess: i}]);}
-            //         io.sockets.sockets[users[0].id].emit('getMessages', [{nickname: user.nickname, mess: i}]);
-                    // if(cmd[1] === users[m].nickname) {
-                    //     io.sockets.sockets.forEach(element => {
-                    //         console.log('scn loop');
-                    //         console.log(element.id);
-                    //         console.log(users[m].id);
-                        
-                    //         if (element.id === users[m].id) {
-                    //             console.log(element);
-                    //             // element.emit('getMessages', [{nickname: user.nickname, mess:'test'}]);
-                    //         }
-                    //     });        
-                    //     sockets.broadcast.to(users[m].id).emit('getMessages', [{nickname: user.nickname, mess:'test'}])
-                    // }
-                // }
+                let msg = "";
+                for(let r = 2; r < cmd[2].length; r++) {
+                    msg += cmd[2][r] + " ";
+                }
                 for(let m = 0; m < users.length; m++) {
-                //     if(cmd[1] === users[m].nickname) {
-                //         console.log('yo')
-                // console.log(users[m].id)
-                        sockets.in(users[m].id).emit('getMessages', [{nickname: user.nickname, mess: users[m].id}]);
-                    // }
+                        sockets.in(users[m].id).emit('getMessages', [{nickname: user.nickname, mess: msg}]);
                 }
             break;
             case 'nick':
@@ -132,7 +98,7 @@ io.on('connection', (sockets) => {
                         users[n] = {id: user.id, nickname: cmd[1]};
                         sockets.emit('getMessages', [{nickname: 'Info', mess: 'Vous avez changer de nom en : ' + cmd[1]}])
                         sockets.broadcast.emit('getMessages', [{nickname: 'Info', mess: user.nickname + ' a changer de nom en : ' + cmd[1]}])
-                        // user = {id: user.id, nickname: cmd[1]}
+                        user = {id: user.id, nickname: cmd[1]}
                         sockets.emit('getUser', user);
                     }
                 }
