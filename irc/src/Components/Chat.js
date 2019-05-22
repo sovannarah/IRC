@@ -17,7 +17,7 @@ class Chat extends Component {
                 room: '',
                 user: {},
                 orders: ["nick", "list", "create", "delete", "join",
-                         "part", "users", "msg"]
+                         "part", "users", "msg", "room"]
             }
             this.handleChange = this.handleChange.bind(this);
             this.handleSubmit = this.handleSubmit.bind(this);
@@ -68,7 +68,7 @@ class Chat extends Component {
             sendMessage('Error', "Cette commande n'existe pas");
         } else {
             let arrayString = this.state.message.split(' ');
-            if(checkCmd === 'msg') {
+            if(checkCmd === 'msg' || checkCmd === 'room') {
                 user({id: sessionStorage.getItem('id') , nickname: sessionStorage.getItem('name')})
                 sendCommand([checkCmd, arrayString[1], arrayString]); 
             } else {
