@@ -55,7 +55,7 @@ io.on('connection', (sockets) => {
             }
             sockets.join(cmd[1]);
             room = cmd[1];
-            curRoom.push([room, user]);
+            curRoom.push([room, sockets]);
             sockets.emit('getRoom', room);
             sockets.emit('getMessages', [{nickname: 'Info', mess:  'Vous avez rejoint le canal ' + cmd[1]}]);
             sockets.to(room).emit('getMessages', [{nickname: 'Info', 
@@ -107,28 +107,6 @@ io.on('connection', (sockets) => {
             }
         }
     }
-    
-    function modifRoom(cmd) {
-        let modifRoom = {};
-        let index = 0;
-        for(let d = 0; d < rooms.length; d++) {
-            if(rooms[d].roomName === cmd[1]) {
-                modifRoom = rooms[d];
-                index = d;
-            }
-        }
-        if(user['id'] === modifRoom['adminId']) {
-            rooms[index].roomName = cmd[2][2];
-            room = cmd[2][2];
-            sockets.rooms[cmd[1]] = cmd[2][2];
-            // sockets.rooms[cmd[1]][2] = cmd[2][2];
-            sockets.emit('getRoom', cmd[2][2]);
-            console.log(sockets.rooms)
-        } else {
-            let deleteMsgError = 'Vous devez etre admin de se canal pour le supprimer';
-            sockets.emit('getMessages', [{nickname: 'Error', mess: deleteMsgError}]);
-        }
-    }
 
     function deleteRoom(cmd) {
         let deleteRoom = {};
@@ -166,6 +144,8 @@ io.on('connection', (sockets) => {
     }
     
     function listRoom(cmd) {
+
+        console.log(curRoom[0][0])
         let roomList = "";
         for(let i = 0; i < rooms.length; i++) {
             if (cmd[1]) {
@@ -198,12 +178,12 @@ io.on('connection', (sockets) => {
         nick: changeNkn,
         delete: deleteRoom,
         list: listRoom,
-        room: modifRoom
     }
     
     sockets.on('login', (nickname) => {
+        sockets.nickname = nickname;
         user = {id: sockets.id, nickname: nickname}; 
-        users.push(user);
+        users.push(sockets);
         sockets.emit('getUser', user);
         
     })
